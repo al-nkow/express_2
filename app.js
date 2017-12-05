@@ -5,6 +5,11 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+var hbs = require('express-handlebars');
+
+var expressValidator = require('express-validator');
+var expressSession = require('express-session');
+
 // routes
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -12,23 +17,28 @@ var users = require('./routes/users');
 var app = express(); // эта строка создает приложение!!!
 
 // view engine setup
+app.engine('hbs', hbs({
+    extname: 'hbs',
+    defaultLayout: 'layout',
+    layoutsDir:  __dirname + '/views/layouts/'
+})); // чтобы использовать handlebars
+// extname - расширение .hbs
 app.set('views', path.join(__dirname, 'views')); // __dirname - это root folder
-app.set('view engine', 'pug');
+// app.set('view engine', 'pug');
+app.set('view engine', 'hbs');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+// Валидатор вставляем именно после bodyParser!!!!
+app.use(expressValidator());
 app.use(cookieParser());
-
-// ========================
-// ========================
 // ========================
 app.use(express.static(path.join(__dirname, 'public')));
 // ========================
-// ========================
-// ========================
+app.use(expressSession({secret: 'max', saveUninitialized: false, resave: false}));
 
 
 // ROUTES!!!!!!!
